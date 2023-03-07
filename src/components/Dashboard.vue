@@ -126,7 +126,7 @@ export default {
     async fetchLeads(page_no) {
       try {
         const resp = await axios.get(
-          `https://lead-collector-frontend.onrender.com/retrieve-leads/${page_no}`
+          `${process.env.VUE_APP_BACKEND_URL}/retrieve-leads/${page_no}`
         );
         this.setLeadsValue(resp);
       } catch (error) {
@@ -139,7 +139,7 @@ export default {
       }
       axios
         .post(
-          `https://lead-collector-frontend.onrender.com/retrieve-leads/${page_no}`,
+          `${process.env.VUE_APP_BACKEND_URL}/retrieve-leads/${page_no}`,
           {
             search: this.search_input || this.selected,
             select: this.filter_name,
@@ -163,9 +163,9 @@ export default {
     },
     downloadLeads() {
       axios
-        .get(`https://lead-collector-frontend.onrender.com/download-leads-csv`)
+        .get(`${process.env.VUE_APP_BACKEND_URL}/download-leads-csv`)
         .then((resp) => {
-          console.log(resp)
+          // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
           var blob = new Blob([resp.data], { type: 'text/csv;charset=utf-8;' });
           var link = document.createElement('a');
           var url = URL.createObjectURL(blob);
