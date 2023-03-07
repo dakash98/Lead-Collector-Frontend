@@ -21,6 +21,7 @@
             v-model="selected"
             v-if="dropdown_options"
           >
+            <option :value='selected'>Select</option>
             <option
               v-for="option in dropdown_options"
               v-bind:value="option"
@@ -71,6 +72,7 @@
           </button>
         </span>
         <button class="btn-success" @click="fetchLeads('all')">Fetch All Leads</button>
+        <button class="btn-success" @click="downloadLeads()">Download All Leads</button>
       </div>
     </div>
     <div v-else>
@@ -96,7 +98,7 @@ export default {
       search_input: "",
       unique_ad_names: [],
       unique_interested_in: [],
-      selected: "",
+      selected: "select",
     };
   },
   computed: {
@@ -124,7 +126,7 @@ export default {
     async fetchLeads(page_no) {
       try {
         const resp = await axios.get(
-          `http://127.0.0.1:8000/retrieve-leads/${page_no}`
+          `https://lead-collector-frontend.onrender.com/retrieve-leads/${page_no}`
         );
         this.setLeadsValue(resp);
       } catch (error) {
@@ -132,9 +134,12 @@ export default {
       }
     },
     async searchInLeads(page_no) {
+      if (this.selected=='') {
+        return ''
+      }
       axios
         .post(
-          `http://127.0.0.1:8000/retrieve-leads/${page_no}`,
+          `https://lead-collector-frontend.onrender.com/retrieve-leads/${page_no}`,
           {
             search: this.search_input || this.selected,
             select: this.filter_name,
@@ -156,6 +161,23 @@ export default {
       this.unique_interested_in = resp["data"]["unique_interested_in"];
       this.page_count = resp["data"]["count"];
     },
+    downloadLeads() {
+      axios
+        .get(`https://lead-collector-frontend.onrender.com/download-leads-csv`)
+        .then((resp) => {
+          console.log(resp)
+          var blob = new Blob([resp.data], { type: 'text/csv;charset=utf-8;' });
+          var link = document.createElement('a');
+          var url = URL.createObjectURL(blob);
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'leads_data.csv');
+          link.style.visibility = 'hidden';
+          console.log("url is : ", link)
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+    }
   },
 };
 </script>
