@@ -1,19 +1,25 @@
 <template>
   <div class="hello">
     <h1>Housing Mark Leads</h1>
-    <select v-model="filter_name">
+    <div v-if="leads.length">
+      <div style="display: flex; justify-content:center; ">
+      <select v-model="filter_name">
       <option value="name">Client Name</option>
       <option value="ad_name">Ad Name</option>
       <option value="interested_in">Interested In</option>
     </select>
-    <input v-model="search_input" placeholder="Search" v-if="!dropdown_options" />
+    <div style="margin-left: 10px ">  
+    <input style="border: 1px solid #ccc;"  v-model="search_input" placeholder="Search" v-if="!dropdown_options" />
     <select class="form-control" name="template" v-model="selected" v-if="dropdown_options">
         <option v-for="option in dropdown_options" v-bind:value="option" :key="option">
           {{ option }}
         </option>
     </select>
-    <input type ="button" value="Search" @click="searchInLeads">
-    <div style="align-items:center" v-if="leads">
+    
+    <input style="margin-left: 3px ;border: 1px solid #ccc;"  type ="button" value="Search" @click="searchInLeads">
+    </div>
+    </div>
+    <div style="align-items:center;   padding-left: 260px ; margin-top:20px" v-if="leads">
       <table>
         <tr style="padding: 10px; background-color: coral">
           <th>Name</th>
@@ -33,13 +39,16 @@
         </tr>
       </table>
     </div>
+    </div>
+    <div v-if="api_call_done">No Result Found</div>
+    <div v-else>Hold On. Fetching Results...</div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 export default {
-  name: "ShowLeads",
+  name: "FetchAllLeads",
   props: {
     msg: String,
   },
@@ -50,7 +59,8 @@ export default {
       search_input: "",
       unique_ad_names: [],
       unique_interested_in: [],
-      selected: ""
+      selected: "",
+      api_call_done: false
     };
   },
   computed:{
@@ -66,12 +76,16 @@ export default {
     }
   },
   mounted() {
+    // setInterval(() => {
+    //   this.fetchLeads();
+    // }, 10000)
     this.fetchLeads();
   },
   methods: {
     async fetchLeads() {
       try {
         const response = await axios.get("http://127.0.0.1:8000/fetch-leads");
+        this.api_call_done=true
         this.leads = response["data"]["leads"];
         this.unique_ad_names = response["data"]["unique_ad_name"]
         this.unique_interested_in = response["data"]["unique_interested_in"]
@@ -81,8 +95,9 @@ export default {
     },
     async searchInLeads() {
       axios
-        .post("http://127.0.0.1:8000/fetch-leads", {'search': this.search_input, 'select' : this.filter_name}, {"headers" : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}})
+        .post("http://127.0.0.1:8000/fetch-leads", {'search': this.search_input || this.selected, 'select' : this.filter_name}, {"headers" : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}})
         .then((resp) => {
+          this.api_call_done=true
           this.leads = resp["data"]["leads"];
           this.unique_ad_names = resp["data"]["unique_ad_name"]
           this.unique_interested_in = resp["data"]["unique_interested_in"]
