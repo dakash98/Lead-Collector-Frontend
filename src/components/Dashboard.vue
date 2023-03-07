@@ -47,6 +47,7 @@
             <th>Ad Name</th>
             <th>Email Sent</th>
             <th>New Lead</th>
+            <th>Created At</th>
           </tr>
           <tr
             style="padding: 10px; background-color: rgb(60, 202, 202)"
@@ -59,6 +60,7 @@
             <td>{{ lead["ad_name"] }}</td>
             <td>{{ lead["email_sent"] }}</td>
             <td>{{ lead["new_lead"] }}</td>
+            <td>{{ lead["created_at"] }}</td>
           </tr>
         </table>
       </div>
@@ -122,7 +124,7 @@ export default {
     async fetchLeads(page_no) {
       try {
         const resp = await axios.get(
-          `https://lead-collector-ypx7.onrender.com/retrieve-leads/${page_no}`
+          `http://127.0.0.1:8000/retrieve-leads/${page_no}`
         );
         this.setLeadsValue(resp);
       } catch (error) {
@@ -132,7 +134,7 @@ export default {
     async searchInLeads(page_no) {
       axios
         .post(
-          `https://lead-collector-ypx7.onrender.com/retrieve-leads/${page_no}`,
+          `http://127.0.0.1:8000/retrieve-leads/${page_no}`,
           {
             search: this.search_input || this.selected,
             select: this.filter_name,
