@@ -12,7 +12,7 @@
           <input
             style="border: 1px solid #ccc"
             v-model="search_input"
-            placeholder="Search"
+            placeholder="Search Client"
             v-if="!dropdown_options"
           />
           <select
@@ -21,7 +21,7 @@
             v-model="selected"
             v-if="dropdown_options"
           >
-            <option :value='selected'>Select</option>
+            <option value="" disabled selected>Select  {{ filter_name.replace("_", " ") }}</option>
             <option
               v-for="option in dropdown_options"
               v-bind:value="option"
@@ -35,7 +35,7 @@
             style="margin-left: 3px; border: 1px solid #ccc"
             type="button"
             value="Search"
-            @click="searchInLeads"
+            @click="searchInLeads(page_no)"
           />
         </div>
       </div>
@@ -71,8 +71,12 @@
             {{ idx }}
           </button>
         </span>
-        <button class="btn-success" @click="fetchLeads('all')">Fetch All Leads</button>
-        <button class="btn-success" @click="downloadLeads()">Download All Leads</button>
+        <button class="btn-success" @click="fetchLeads('all')">
+          Fetch All Leads
+        </button>
+        <button class="btn-success" @click="downloadLeads()">
+          Download All Leads
+        </button>
       </div>
     </div>
     <div v-else>
@@ -98,7 +102,8 @@ export default {
       search_input: "",
       unique_ad_names: [],
       unique_interested_in: [],
-      selected: "select",
+      selected: "",
+      page_no: 1,
     };
   },
   computed: {
@@ -124,6 +129,7 @@ export default {
       this.selected = "";
     },
     async fetchLeads(page_no) {
+      this.page_no = page_no;
       try {
         const resp = await axios.get(
           `${process.env.VUE_APP_BACKEND_URL}/retrieve-leads/${page_no}`
@@ -134,9 +140,10 @@ export default {
       }
     },
     async searchInLeads(page_no) {
-      if (this.selected=='') {
-        return ''
+      if ((this.selected == "") & (this.search_input == "")) {
+        return "";
       }
+      this.page_no = page_no;
       axios
         .post(
           `${process.env.VUE_APP_BACKEND_URL}/retrieve-leads/${page_no}`,
@@ -157,8 +164,8 @@ export default {
     },
     setLeadsValue(resp) {
       this.leads = resp["data"]["leads"];
-      this.unique_ad_names = resp["data"]["unique_ad_name"];
-      this.unique_interested_in = resp["data"]["unique_interested_in"];
+      this.unique_ad_names=resp["data"]["unique_ad_name"];
+      this.unique_interested_in=resp["data"]["unique_interested_in"];
       this.page_count = resp["data"]["count"];
     },
     downloadLeads() {
@@ -166,18 +173,18 @@ export default {
         .get(`${process.env.VUE_APP_BACKEND_URL}/download-leads-csv`)
         .then((resp) => {
           // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
-          var blob = new Blob([resp.data], { type: 'text/csv;charset=utf-8;' });
-          var link = document.createElement('a');
+          var blob = new Blob([resp.data], { type: "text/csv;charset=utf-8;" });
+          var link = document.createElement("a");
           var url = URL.createObjectURL(blob);
-          link.setAttribute('href', url);
-          link.setAttribute('download', 'leads_data.csv');
-          link.style.visibility = 'hidden';
-          console.log("url is : ", link)
+          link.setAttribute("href", url);
+          link.setAttribute("download", "leads_data.csv");
+          link.style.visibility = "hidden";
+          console.log("url is : ", link);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
         });
-    }
+    },
   },
 };
 </script>
@@ -202,8 +209,8 @@ a {
   margin: 3px 3px 0 3px;
   padding: 4px 15px 4px 15px;
   color: #fff;
-  background-color: #00203FFF;
-  border-color: #00203FFF;
+  background-color: #00203fff;
+  border-color: #00203fff;
 }
 .btn-success:hover {
   background-color: rgb(6, 101, 173);
