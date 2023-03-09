@@ -2,7 +2,6 @@
   <div class="hello">
     <h1>Leads Collector</h1>
     <div v-if="leads.length">
-      <p>Total Leads : {{ leads.length }}</p>
       <div style="display: flex; justify-content: center">
         <select v-model="filter_name" @click="resetInputValue()" :disabled="is_search_button_active">
           <option value="name">Client Name</option>
@@ -92,6 +91,7 @@
           Download All Leads
         </button>
       </div>
+      <p>Total Leads : {{ leads.length }}, Current Page {{ page_no }}</p>
     </div>
     <div v-else>
       <div>
