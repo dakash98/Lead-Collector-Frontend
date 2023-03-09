@@ -2,8 +2,9 @@
   <div class="hello">
     <h1>Leads Collector</h1>
     <div v-if="leads.length">
+      <p>Total Leads : {{ leads.length }}</p>
       <div style="display: flex; justify-content: center">
-        <select v-model="filter_name" @click="resetInputValue()">
+        <select v-model="filter_name" @click="resetInputValue()" :disabled="is_search_button_active">
           <option value="name">Client Name</option>
           <option value="ad_name">Ad Name</option>
           <option value="interested_in">Interested In</option>
@@ -14,12 +15,14 @@
             v-model="search_input"
             placeholder="Search Client"
             v-if="!dropdown_options"
+            :disabled="is_search_button_active"
           />
           <select
             class="form-control"
             name="template"
             v-model="selected"
             v-if="dropdown_options"
+            :disabled="is_search_button_active"
           >
             <option value="" disabled selected>Select  {{ filter_name.replace("_", " ") }}</option>
             <option
@@ -35,7 +38,18 @@
             style="margin-left: 3px; border: 1px solid #ccc"
             type="button"
             value="Search"
+            :class="{'btn-success':!is_search_button_active}"
             @click="searchInLeads(page_no)"
+            :disabled="is_search_button_active"
+          />
+
+          <input
+            style="margin-left: 3px; border: 1px solid #ccc"
+            type="button"
+            :class="{'btn-success':is_search_button_active}"
+            value="Reset Filters"
+            @click="resetFilters()"
+            :disabled="!is_search_button_active"
           />
         </div>
       </div>
@@ -104,6 +118,7 @@ export default {
       unique_interested_in: [],
       selected: "",
       page_no: 1,
+      is_search_button_active: false
     };
   },
   computed: {
@@ -124,6 +139,12 @@ export default {
     this.fetchLeads(1);
   },
   methods: {
+    resetFilters() {
+      this.filter_name='name';
+      this.is_search_button_active=false;
+      this.resetInputValue();
+      this.fetchLeads(this.page_no);
+    },
     resetInputValue() {
       this.search_input = "";
       this.selected = "";
@@ -143,6 +164,7 @@ export default {
       if ((this.selected == "") & (this.search_input == "")) {
         return "";
       }
+      this.is_search_button_active = true;
       this.page_no = page_no;
       axios
         .post(
@@ -213,6 +235,14 @@ a {
   border-color: #00203fff;
 }
 .btn-success:hover {
+  background-color: rgb(6, 101, 173);
+  border-color: rgb(6, 101, 173);
+}
+/* .btn-success:active {
+  background-color: rgb(6, 101, 173);
+  border-color: rgb(6, 101, 173);
+} */
+.btn-success:focus{
   background-color: rgb(6, 101, 173);
   border-color: rgb(6, 101, 173);
 }
