@@ -133,10 +133,10 @@ export default {
     },
   },
   mounted() {
-    // setInterval(() => {
-    //   this.fetchLeads();
-    // }, 10000)
-    this.fetchLeads(1);
+    setInterval(() => {
+      this.fetchLeads();
+    }, process.env.VUE_APP_PAGE_REFRESH)
+    // this.fetchLeads(1);
   },
   methods: {
     resetFilters() {
