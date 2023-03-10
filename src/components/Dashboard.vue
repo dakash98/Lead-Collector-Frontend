@@ -133,9 +133,9 @@ export default {
     },
   },
   mounted() {
-    this.fetchLeads(1);
+    this.fetchLeads(this.page_no);
     setInterval(() => {
-      this.fetchLeads(1);
+      this.fetchLeads(this.page_no);
     }, process.env.VUE_APP_PAGE_REFRESH)
     // this.fetchLeads(1);
   },
