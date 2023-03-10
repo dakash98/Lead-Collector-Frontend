@@ -133,6 +133,7 @@ export default {
     },
   },
   mounted() {
+    this.fetchLeads(1);
     setInterval(() => {
       this.fetchLeads(1);
     }, process.env.VUE_APP_PAGE_REFRESH)
